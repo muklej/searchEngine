@@ -155,4 +155,61 @@ public class SearchControllerTest {
 		Assert.assertEquals(document1, foundDocuments.get(0));
 		Assert.assertEquals(document2, foundDocuments.get(1));
 	}
+
+	@Test
+	public void findNonProvidedTokenTest() throws Exception {
+		//given
+		Document document1 = new Document("the brown fox jumped over the brown dog");
+		Document document2 = new Document("the lazy brown dog sat in the corner");
+		Document document3 = new Document("the red fox bit the lazy dog");
+		List<Document> documents = Arrays.asList(
+			document1,
+			document2,
+			document3
+		);
+		String documentsInString = objectMapper.writeValueAsString(documents);
+
+		//when
+		mockMvc.perform(post(SEARCH_ENGINE_ENDPOINT + ADD_DOCUMENTS_ENDPOINT)
+					.contentType(APPLICATION_JSON)
+					.content(documentsInString))
+			.andExpect(status().isOk());
+		mockMvc.perform(get(SEARCH_ENGINE_ENDPOINT + SEARCH_ENDPOINT)
+							   .contentType(APPLICATION_JSON))
+			//then
+			.andExpect(status().is4xxClientError());
+	}
+
+	@Test
+	public void findEmptySearchTest() throws Exception {
+		//given
+		Document document1 = new Document("the brown fox jumped over the brown dog");
+		Document document2 = new Document("the lazy brown dog sat in the corner");
+		Document document3 = new Document("the red fox bit the lazy dog");
+		List<Document> documents = Arrays.asList(
+			document1,
+			document2,
+			document3
+		);
+		String documentsInString = objectMapper.writeValueAsString(documents);
+
+		//when
+		mockMvc.perform(post(SEARCH_ENGINE_ENDPOINT + ADD_DOCUMENTS_ENDPOINT)
+					.contentType(APPLICATION_JSON)
+					.content(documentsInString))
+			.andExpect(status().isOk());
+		MvcResult result = mockMvc.perform(get(SEARCH_ENGINE_ENDPOINT + SEARCH_ENDPOINT)
+							   .contentType(APPLICATION_JSON)
+							   .param("token", ""))
+			//then
+			.andExpect(status().isOk())
+			.andReturn();
+		List<Document> foundDocuments = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<Document>>() {});
+
+		//then
+		Assert.assertFalse(foundDocuments.isEmpty());
+		Assert.assertEquals(2, foundDocuments.size());
+		Assert.assertEquals(document1, foundDocuments.get(0));
+		Assert.assertEquals(document2, foundDocuments.get(1));
+	}
 }

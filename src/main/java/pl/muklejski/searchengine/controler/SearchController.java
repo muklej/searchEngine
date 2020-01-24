@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class SearchController {
 
 	@GetMapping(value = SearchApi.SEARCH_ENDPOINT)
 	@ResponseBody
-	public List<Document> findDocuments(@RequestParam String token) {
+	public List<Document> findDocuments(@RequestParam @NotNull @Valid String token) {
 		return searchEngineService.findDocuments(token);
 	}
 

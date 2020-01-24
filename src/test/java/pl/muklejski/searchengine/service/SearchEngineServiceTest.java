@@ -82,4 +82,25 @@ public class SearchEngineServiceTest {
 		Assert.assertEquals(document3, foundDocuments.get(0));
 		Assert.assertEquals(document1, foundDocuments.get(1));
 	}
+
+	@Test
+	public void nullTest() {
+		//given
+
+		Document document1 = new Document("the brown fox jumped over the brown dog");
+		Document document2 = new Document("the lazy brown dog sat in the corner");
+		Document document3 = new Document("the red fox bit the lazy dog");
+		List<Document> documents = Arrays.asList(
+			document1,
+			document2,
+			document3
+		);
+		searchEngineService.addDocuments(documents);
+
+		//when
+		List<Document> foundDocuments = searchEngineService.findDocuments(null);
+
+		//then
+		Assert.assertTrue(foundDocuments.isEmpty());
+	}
 }

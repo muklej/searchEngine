@@ -1,8 +1,10 @@
 package pl.muklejski.searchengine.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +37,7 @@ public class InvertedIndexImpl implements InvertedIndex {
 		for (String token : tokens) {
 			Map<Document, Long> documentMap = new HashMap<>();
 			documentMap.put(document, 1L);
-				invertedIndex.merge(token,
+			invertedIndex.merge(token,
 					    documentMap,
 					    (oldDocumentsMap, newDocumentMap) -> {
 						    newDocumentMap.forEach((documentKey, counter) -> oldDocumentsMap.merge(documentKey, counter, Long::sum));
@@ -46,7 +48,7 @@ public class InvertedIndexImpl implements InvertedIndex {
 
 	@Override
 	public Map<Document, Long> findDocuments(String token) {
-		return invertedIndex.get(token);
+		return Optional.ofNullable(invertedIndex.get(token)).orElse(Collections.emptyMap());
 	}
 
 }
